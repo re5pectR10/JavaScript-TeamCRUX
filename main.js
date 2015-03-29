@@ -3,6 +3,10 @@ var ctx = canvas.getContext('2d');
 
 var _cellSize = 50;
 var field = [];
+var enemies = [];
+var possibleMoves, currentMove, forbiddenMove;
+
+/* initialize the field */
 for (var i = 0; i < canvas.width / _cellSize; i++) {
     for (var j = 0; j < canvas.height / _cellSize; j++) {
         if (i == 0 || i == canvas.width / _cellSize - 1 || j == canvas.height / _cellSize - 1 || j == 0 ||
@@ -12,9 +16,10 @@ for (var i = 0; i < canvas.width / _cellSize; i++) {
     }
 }
 
-var player = new Player(50, 50);
-var enemy = new Player(700, 50);
-var enemy2 = new Player(700, 50);
+var player = new Player(50, 50, 45);
+for (i = 0; i < 3; i++) {
+    enemies.push(new Player(700, 50, 50));
+}
 
 var input = new Input();
 attachListeners(input);
@@ -22,9 +27,10 @@ attachListeners(input);
 function update() {
     tick();
     render(ctx);
-    movement();
-    AI(enemy);
-    AI(enemy2);
+    movement(player);
+    enemies.forEach(function(el) {
+       AI(el);
+    });
     requestAnimationFrame(update);
 }
 
@@ -61,42 +67,36 @@ function AI(enemy) {
         timeDiff = new Date().getTime() / 1000;
     }*/
 
-    var possibleMoves = checkMove2(enemy);
-    /*var cantMove = possibleMoves.filter(function(el) {
-       return el === false;
-    });*/
-    var currentMove;
-    for (var key in enemy.movement) {
-        if (enemy.movement[key] === true) {
-            currentMove = key;
-        }
-        //enemy.movement[key] = false;
-    }
-    //console.log(currentMove);
-    var forbiddenMove;
-    if (currentMove === 'left') {
-        forbiddenMove = 'right';
-    } else if (currentMove === 'right') {
-        forbiddenMove = 'left';
-    } else if (currentMove === 'up') {
-        forbiddenMove = 'down';
-    } else if (currentMove === 'down') {
-        forbiddenMove = 'up';
-    }
+   for (var key in enemy.movement) {
+       if (enemy.movement[key] === true) {
+           currentMove = key;
+       }
+   }
 
-        var canMove = (function() {
-        var out = {};
-        for (var i in enemy.movement) {//console.log(forbiddenMove);
-            if (typeof possibleMoves[i] === "undefined" && i !== forbiddenMove) {
-                out[i] = true;
-            }
-        }
-        return out;
-    }());
-    enemy.movement[currentMove] = false;
-    //console.log(canMove);
-    enemy.movement[Object.keys(canMove)[Math.floor(Math.random() * (Object.size(canMove) - 1))]] = true;
-    enemy.move(canvas.width);
+   if (currentMove === 'left') {
+       forbiddenMove = 'right';
+   } else if (currentMove === 'right') {
+       forbiddenMove = 'left';
+   } else if (currentMove === 'up') {
+       forbiddenMove = 'down';
+   } else if (currentMove === 'down') {
+       forbiddenMove = 'up';
+   }
+
+   possibleMoves = (function() {
+       var out = {};
+       var impossibleMoves = checkMove(enemy);
+       for (var i in enemy.movement) {
+           if (typeof impossibleMoves[i] === "undefined" && i !== forbiddenMove) {
+               out[i] = true;
+           }
+       }
+       return out;
+   }());
+
+   enemy.movement[currentMove] = false;
+   enemy.movement[Object.keys(possibleMoves)[Math.floor(Math.random() * (Object.size(possibleMoves) - 1))]] = true;
+   enemy.move(canvas.width);
 }
 
 Object.size = function(obj) {
@@ -107,85 +107,47 @@ Object.size = function(obj) {
     return size;
 };
 
-function movement() {
-    if (input.left) {
-        player.movement.left = true;
-    } else {
-        player.movement.left = false;
-    }
+function movement(player) {
+    input.left ? player.movement.left = true : player.movement.left = false;
+    input.right ? player.movement.right = true : player.movement.right = false;
+    input.up ? player.movement.up = true : player.movement.up = false;
+    input.down ? player.movement.down = true : player.movement.down = false;
 
-    if (input.right) {
-        player.movement.right = true;
-    } else {
-        player.movement.right = false;
+    var cantMove = checkMove(player);
+    for (var move in cantMove) {
+        player.movement[move] = false;
     }
-
-    if (input.up) {
-        player.movement.up = true;
-    } else {
-        player.movement.up = false;
-    }
-
-    if (input.down) {
-        player.movement.down = true;
-    } else {
-        player.movement.down = false;
-    }
-
-    checkMove(player);
 
     player.move(canvas.width);
 }
 
-function checkMove2(player) {
+/* return object with forbidden directions */
+function checkMove(player) {
     var obj = {};
     field.forEach(function(el) {
         if (el.rect.intersects(player.rect)) {
             if (el.position.x > player.position.x && el.position.y < player.position.y + player.height && el.position.y + el.height > player.position.y) {
-                //player.movement.right = false;
                 obj.right = false;
             }
             if (el.position.x < player.position.x && el.position.y < player.position.y + player.height && el.position.y + el.height > player.position.y) {
-                //player.movement.left = false;
                 obj.left = false;
             }
             if (el.position.y < player.position.y && el.position.x < player.position.x + player.width && el.position.x + el.width > player.position.x) {
-                //player.movement.up = false;
                 obj.up = false;
             }
             if (el.position.y > player.position.y && el.position.x < player.position.x + player.width && el.position.x + el.width > player.position.x) {
-               // player.movement.down = false;
                 obj.down = false;
             }
         }
     });
     return obj;
 }
-function checkMove(player) {
-    field.forEach(function(el) {
-        if (el.rect.intersects(player.rect)) {
-            if (el.position.x > player.position.x && el.position.y < player.position.y + player.height && el.position.y + el.height > player.position.y) {
-                player.movement.right = false;
-            }
-            if (el.position.x < player.position.x && el.position.y < player.position.y + player.height && el.position.y + el.height > player.position.y) {
-                player.movement.left = false;
-            }
-            if (el.position.y < player.position.y && el.position.x < player.position.x + player.width && el.position.x + el.width > player.position.x) {
-                player.movement.up = false;
-            }
-            if (el.position.y > player.position.y && el.position.x < player.position.x + player.width && el.position.x + el.width > player.position.x) {
-                player.movement.down = false;
-            }
-        }
-    });
-}
 
 function tick() {
-    //ball.animation.update();
     player.animation.update();
-    enemy.animation.update(); enemy2.animation.update();
-    //player2.animation.update();
-    //ball.move(canvas.width, canvas.height);
+    enemies.forEach(function(el){
+       el.animation.update();
+    });
 }
 
 function render(ctx) {
@@ -194,7 +156,9 @@ function render(ctx) {
        el.draw(ctx);
     });
 
-    enemy.animation.draw(ctx);enemy2.animation.draw(ctx);
+    enemies.forEach(function(el){
+        el.animation.draw(ctx);
+    });
     player.animation.draw(ctx);
 }
 

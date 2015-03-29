@@ -1,9 +1,9 @@
 var Player = (function() {
-    function Player(x, y) {
+    function Player(x, y, size) {
         this.position = new Vector2(x, y);
         this.speed = 5;
-        this.width = 50;
-        this.height = 50;
+        this.width = size;
+        this.height = size;
         this.movement = {right: false, left: false, up: false, down: false};
         this.rect = new Rectangle(x, y, this.width, this.height);
         this.animation = new Animation(this.width, this.height, 0, 0, 1, 'paddles.PNG', 20, 1, 2);
