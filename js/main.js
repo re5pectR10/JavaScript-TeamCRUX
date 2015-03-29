@@ -4,21 +4,38 @@ var ctx = canvas.getContext('2d');
 var _cellSize = 50;
 var field = [];
 var enemies = [];
+var points = [];
 var possibleMoves, currentMove, forbiddenMove;
 
 /* initialize the field */
 for (var i = 0; i < canvas.width / _cellSize; i++) {
     for (var j = 0; j < canvas.height / _cellSize; j++) {
         if (i == 0 || i == canvas.width / _cellSize - 1 || j == canvas.height / _cellSize - 1 || j == 0 ||
-            (i % 2 == 0 && j % 2 == 0)){
-            field.push(new Wall(i, j));
+            (i % 2 == 0 && j % 2 == 0)) {
+            if (i == 0 && j == 0) {
+                field.push(new Wall(i, j, 8));
+            } else if (i == canvas.width / _cellSize - 1 && j == 0) {
+                field.push(new Wall(i, j, 9));
+            } else if (i == 0 && j == canvas.height / _cellSize - 1) {
+                field.push(new Wall(i, j, 6));
+            } else if (i == canvas.width / _cellSize - 1 && j == canvas.height / _cellSize - 1) {
+                field.push(new Wall(i, j, 7));
+            } else if (j == 0 || j == canvas.height / _cellSize - 1){
+                field.push(new Wall(i, j, 4));
+            } else if (i == 0 || i == canvas.width / _cellSize - 1) {
+                field.push(new Wall(i, j, 10));
+            } else if (i % 2 == 0 && j % 2 == 0) {
+                field.push(new Wall(i, j, 11));
+            }
+        } else {
+            points.push(new Point(i, j));
         }
     }
 }
 
-var player = new Player(50, 50, 45);
-for (i = 0; i < 3; i++) {
-    enemies.push(new Player(700, 50, 50));
+var player = new Player(50, 50, 45, 'assets/pacman.png', 0, 2);
+for (i = 0; i < 4; i++) {
+    enemies.push(new Player(700, 50, 50, 'assets/pac.png', i * 2, 14));
 }
 
 var input = new Input();
@@ -28,10 +45,39 @@ function update() {
     tick();
     render(ctx);
     movement(player);
+    updatePoints(player);
+    checkDead(player);
     enemies.forEach(function(el) {
        AI(el);
     });
     requestAnimationFrame(update);
+}
+
+function updatePoints(player) {
+    var pointForRemove;
+    points.forEach(function(el) {
+       if (el.rect.intersects(player.rect)) {
+           player.points += 10;
+           pointForRemove = el;
+       }
+    });
+
+    if (pointForRemove) {
+        points.removeAt(points.indexOf(pointForRemove));
+    }
+}
+
+function checkDead(player) {
+    enemies.forEach(function(el) {
+       if (el.rect.intersects(player.rect)) {
+           if (player.lives == 0) {
+               // end game
+           } else {
+               player.lives--;
+               player.position = new Vector2(50, 50);
+           }
+       }
+    });
 }
 
 function AI(enemy) {
@@ -118,7 +164,20 @@ function movement(player) {
         player.movement[move] = false;
     }
 
+    updateAnimationDirection(player);
     player.move(canvas.width);
+}
+
+function updateAnimationDirection(player) {
+    if (player.movement.left) {
+        player.animation.setRow(2);
+    } else if (player.movement.up) {
+        player.animation.setRow(3);
+    } else if (player.movement.right) {
+        player.animation.setRow(0);
+    } else if (player.movement.down) {
+        player.animation.setRow(1);
+    }
 }
 
 /* return object with forbidden directions */
@@ -148,12 +207,19 @@ function tick() {
     enemies.forEach(function(el){
        el.animation.update();
     });
+    field.forEach(function(el){
+       el.animation.update();
+    });
 }
 
 function render(ctx) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     field.forEach(function(el) {
-       el.draw(ctx);
+       el.animation.draw(ctx);
+    });
+
+    points.forEach(function(el) {
+        el.animation.draw(ctx);
     });
 
     enemies.forEach(function(el){

@@ -1,12 +1,14 @@
 var Player = (function() {
-    function Player(x, y, size) {
+    function Player(x, y, size, spritePath, col, allCols) {
         this.position = new Vector2(x, y);
         this.speed = 5;
         this.width = size;
         this.height = size;
+        this.points = 0;
+        this.lives = 3;
         this.movement = {right: false, left: false, up: false, down: false};
         this.rect = new Rectangle(x, y, this.width, this.height);
-        this.animation = new Animation(this.width, this.height, 0, 0, 1, 'paddles.PNG', 20, 1, 2);
+        this.animation = new Animation(this.width, this.height, 0, col, 2, spritePath, 4, allCols, 4);
         this.animation.position = this.position;
     }
 
