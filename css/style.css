@@ -4,27 +4,18 @@ body {
 #canvas-container {
     width: 850px;
     margin: auto;
+    display:inline-block;
+
 }
 
 canvas {
     display: inline;
 
 }
-div#score-and-lvl {
-    margin:0 auto;
-    width:800px;
-}
-div#score-and-lvl p {
+div#score, div#lvl{
     display: inline-block;
     color:#0067FF;
-}
-p#lvl {
-    float:right;
-}
-p#lvl:after {
-    content: "";
-	display: block;
-	clear: both;
-	zoom: 1;
-	height: 0;
+    width:10%;
+    vertical-align :top;
+    text-align :center;
 }
