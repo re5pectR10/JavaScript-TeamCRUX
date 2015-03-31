@@ -1,3 +1,7 @@
+body {
+    background:#000;
+}
+
 #canvas-container {
     width: 850px;
     margin: auto;
@@ -5,5 +9,12 @@
 
 canvas {
     display: inline;
+}
 
+#score, #lvl, #lives{
+    display: inline-block;
+    color:#0067FF;
+    width:10%;
+    vertical-align :top;
+    text-align :center;
 }

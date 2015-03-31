@@ -1,14 +1,12 @@
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
-var player1points = document.getElementById('points');
-var player1lives = document.getElementById('lives');
+
+var playerLives = document.getElementById('lives');
+var lvl = document.getElementById('lvl');
 
 var _cellSize = 50;
-var field = [];
-var enemies = [];
-var points = [];
-var bonuses = [];
-var possibleMoves, currentMove, forbiddenMove, powerModeStartTime, level = 1;
+var field = [], enemies = [], points = [], bonuses = [];
+var possibleMoves, currentMove, forbiddenMove, powerModeStartTime, level = 0;
 
 var input = new Input();
 attachListeners(input);
@@ -48,6 +46,9 @@ function initField() {
             }
         }
     }
+
+    level++;
+    lvl.innerHTML = "Level: " + level;
 }
 
 function initEnemies() {
@@ -70,8 +71,7 @@ function update() {
     movement(player);
     updatePoints(player);
     updateBonuses(player);
-    player1points.innerHTML = player.points;
-    player1lives.innerHTML = player.lives;
+    playerLives.innerHTML = "Lives: " + player.lives;
 
     if (powerModeStartTime + 7 < new Date().getTime() / 1000) {
         disablePowerMode(player);
@@ -108,9 +108,11 @@ function updatePoints(player) {
 
     points.forEach(function(el) {
        if (el.rect.intersects(player.rect)) {
-           player.points += 10;
+           player.points += 1;
            pointForRemove = el;
+           document.getElementById('score').innerHTML = 'Score: ' + player.points;
        }
+       
     });
 
     if (pointForRemove) {
@@ -133,7 +135,6 @@ function updateBonuses(player) {
         bonuses.removeAt(bonuses.indexOf(bonusForRemove));
         if (bonuses === undefined || bonuses.length == 0) {
             setTimeout(fillBonuses, 5000);
-            //fillBonuses();
         }
     }
 }
@@ -144,7 +145,7 @@ function checkDead(player) {
            if (player.powerMode && el.powerMode) {
                el.position = new Vector2(700, 50);
                el.unsetPowerMode();
-               player.points += 50;
+               player.points += 5;
            } else {
                if (player.lives == 0) {
                    // end game
