@@ -24,7 +24,14 @@ div#menu {
     height: auto;
     overflow: auto;
     width: 100%;
-    background:#fff;
+    background:#000;
+    text-align :center ;
+    color:#0067FF;
+}
+div#menu a {
+    font-size: 2rem;
+    text-decoration: none;
+
 }
 div#score, div#lvl{
     display: inline-block;
