@@ -1,11 +1,10 @@
-var Player = (function() {
-    function Player(x, y, size, spritePath, col, allCols) {
+var Ghost = (function() {
+    function Ghost(x, y, size, spritePath, col, allCols) {
         this.position = new Vector2(x, y);
         this.speed = 5;
         this.width = size;
         this.height = size;
-        this.points = 0;
-        this.lives = 3;
+        this.ghostType = col;
         this.powerMode = false;
         this.movement = {right: false, left: false, up: false, down: false};
         this.rect = new Rectangle(x, y, this.width, this.height);
@@ -13,11 +12,7 @@ var Player = (function() {
         this.animation.position = this.position;
     }
 
-    Player.prototype.setStartPosition = function() {
-        this.position = new Vector2(55, 55);
-    };
-
-    Player.prototype.move = function(width) {
+    Ghost.prototype.move = function(width) {
         if (this.movement.left) {
             this.position.move(new Vector2(-this.speed, 0));
         } else if (this.movement.right) {
@@ -31,19 +26,19 @@ var Player = (function() {
         }
 
         if (this.position.y < 0) {
-            this.position.y = canvas.height - 5;
+            this.position.y = canvas.height;
         }
 
         if (this.position.y > canvas.height) {
-            this.position.y = 5;
+            this.position.y = 0;
         }
 
         if (this.position.x > canvas.width) {
-            this.position.x = 5;
+            this.position.x = 0;
         }
 
         if (this.position.x < 0) {
-            this.position.x = canvas.width - 5;
+            this.position.x = canvas.width;
         }
 
         this.animation.position = this.position;
@@ -51,5 +46,15 @@ var Player = (function() {
         this.rect.y = this.position.y;
     };
 
-    return Player;
+    Ghost.prototype.setPowerMode = function() {
+        this.animation.setColumn(12);
+        this.powerMode = true;
+    };
+
+    Ghost.prototype.unsetPowerMode = function() {
+        this.animation.setColumn(this.ghostType);
+        this.powerMode = false;
+    };
+
+    return Ghost;
 }());

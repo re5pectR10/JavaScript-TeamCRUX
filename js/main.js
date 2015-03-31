@@ -1,17 +1,28 @@
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
-var score = 0;
+
+var playerLives = document.getElementById('lives');
+var lvl = document.getElementById('lvl');
+
 var _cellSize = 50;
-var field = [];
-var enemies = [];
-var points = [];
-var possibleMoves, currentMove, forbiddenMove;
+var field = [], enemies = [], points = [], bonuses = [];
+var possibleMoves, currentMove, forbiddenMove, powerModeStartTime, level = 0;
+
+var input = new Input();
+attachListeners(input);
+
+var player = new Player(50, 50, 45, 'assets/pacman.png', 0, 2);
 
 /* initialize the field */
-for (var i = 0; i < canvas.width / _cellSize; i++) {
-    for (var j = 0; j < canvas.height / _cellSize; j++) {
-        if (i == 0 || i == canvas.width / _cellSize - 1 || j == canvas.height / _cellSize - 1 || j == 0 ||
-            (i % 2 == 0 && j % 2 == 0)) {
+function initField() {
+    for (var i = 0; i < canvas.width / _cellSize; i++) {
+        for (var j = 0; j < canvas.height / _cellSize; j++) {
+
+            if ((i == Math.floor(canvas.width / _cellSize / 2) && j == 0) || (i == Math.floor(canvas.width / _cellSize / 2) && j == canvas.height / _cellSize - 1) ||
+                (i == 0 && j == Math.floor(canvas.height / _cellSize / 2)) || (i == canvas.width / _cellSize - 1 && j == Math.floor(canvas.height / _cellSize / 2))) {
+                continue;
+            }
+
             if (i == 0 && j == 0) {
                 field.push(new Wall(i, j, 8));
             } else if (i == canvas.width / _cellSize - 1 && j == 0) {
@@ -20,46 +31,86 @@ for (var i = 0; i < canvas.width / _cellSize; i++) {
                 field.push(new Wall(i, j, 6));
             } else if (i == canvas.width / _cellSize - 1 && j == canvas.height / _cellSize - 1) {
                 field.push(new Wall(i, j, 7));
-            } else if (j == 0 || j == canvas.height / _cellSize - 1){
+            } else if (j == 0 || j == canvas.height / _cellSize - 1) {
                 field.push(new Wall(i, j, 4));
             } else if (i == 0 || i == canvas.width / _cellSize - 1) {
                 field.push(new Wall(i, j, 10));
             } else if (i % 2 == 0 && j % 2 == 0) {
                 field.push(new Wall(i, j, 11));
+            } else if ((i == 1 && j == canvas.height / _cellSize - 2) ||
+                (i == canvas.width / _cellSize - 2 && j == canvas.height / _cellSize - 2) ||
+                (i == 1 && j == 1) ||
+                (i == canvas.width / _cellSize - 2 && j == 1)) {
+            } else {
+                points.push(new Point(i, j));
             }
-        } else {
-            points.push(new Point(i, j));
         }
+    }
+
+    level++;
+    lvl.innerHTML = "Level: " + level;
+}
+
+function initEnemies() {
+    for (var i = 0; i < 4; i++) {
+        enemies.push(new Ghost(700, 50, 50, 'assets/pac.png', i * 2, 14));
     }
 }
 
-var player = new Player(50, 50, 45, 'assets/pacman.png', 0, 2);
-for (i = 0; i < 4; i++) {
-    enemies.push(new Player(700, 50, 50, 'assets/pac.png', i * 2, 14));
+function fillBonuses() {
+    bonuses.push(new Bonus(1, 1));
+    bonuses.push(new Bonus(1, canvas.height / _cellSize - 2));
+    bonuses.push(new Bonus(canvas.width / _cellSize - 2, canvas.height / _cellSize - 2));
+    bonuses.push(new Bonus(canvas.width / _cellSize - 2, 1));
 }
-
-var input = new Input();
-attachListeners(input);
 
 function update() {
     tick();
     render(ctx);
+    checkDead(player);
     movement(player);
     updatePoints(player);
-    checkDead(player);
+    updateBonuses(player);
+    playerLives.innerHTML = "Lives: " + player.lives;
+
+    if (powerModeStartTime + 7 < new Date().getTime() / 1000) {
+        disablePowerMode(player);
+    }
+
     enemies.forEach(function(el) {
        AI(el);
     });
     requestAnimationFrame(update);
 }
 
+function enablePowerMode(player) {
+    enemies.forEach(function(el) {
+        el.setPowerMode();
+        player.powerMode = true;
+    });
+}
+
+function disablePowerMode(player) {
+    enemies.forEach(function(el) {
+        el.unsetPowerMode();
+        player.powerMode = false;
+    });
+}
+
 function updatePoints(player) {
     var pointForRemove;
+
+    if (points.length == 0) {
+        initField();
+        fillBonuses();
+        player.setStartPosition();
+    }
+
     points.forEach(function(el) {
        if (el.rect.intersects(player.rect)) {
            player.points += 1;
            pointForRemove = el;
-           score = player.points;
+           document.getElementById('score').innerHTML = 'Score: ' + player.points;
        }
        
     });
@@ -67,16 +118,41 @@ function updatePoints(player) {
     if (pointForRemove) {
         points.removeAt(points.indexOf(pointForRemove));
     }
-    document.getElementById('score').innerHTML = 'Score: ' + score;
 }
+
+function updateBonuses(player) {
+    var bonusForRemove;
+
+    bonuses.forEach(function(el) {
+        if (el.rect.intersects(player.rect)) {
+            enablePowerMode(player);
+            powerModeStartTime = new Date().getTime() / 1000;
+            bonusForRemove = el;
+        }
+    });
+
+    if (bonusForRemove) {
+        bonuses.removeAt(bonuses.indexOf(bonusForRemove));
+        if (bonuses === undefined || bonuses.length == 0) {
+            setTimeout(fillBonuses, 5000);
+        }
+    }
+}
+
 function checkDead(player) {
     enemies.forEach(function(el) {
        if (el.rect.intersects(player.rect)) {
-           if (player.lives == 0) {
-               // end game
+           if (player.powerMode && el.powerMode) {
+               el.position = new Vector2(700, 50);
+               el.unsetPowerMode();
+               player.points += 5;
            } else {
-               player.lives--;
-               player.position = new Vector2(50, 50);
+               if (player.lives == 0) {
+                   // end game
+               } else {
+                   player.lives--;
+                   player.setStartPosition();
+               }
            }
        }
     });
@@ -212,6 +288,12 @@ function tick() {
     field.forEach(function(el){
        el.animation.update();
     });
+    points.forEach(function(el) {
+        el.animation.update();
+    });
+    bonuses.forEach(function(el) {
+        el.animation.update();
+    });
 }
 
 function render(ctx) {
@@ -224,10 +306,17 @@ function render(ctx) {
         el.animation.draw(ctx);
     });
 
+    bonuses.forEach(function(el) {
+        el.animation.draw(ctx);
+    });
+
     enemies.forEach(function(el){
         el.animation.draw(ctx);
     });
     player.animation.draw(ctx);
 }
 
+initField();
+fillBonuses();
+initEnemies();
 update();
