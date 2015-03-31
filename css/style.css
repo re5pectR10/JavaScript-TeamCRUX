@@ -5,6 +5,7 @@ body {
 #canvas-container {
     width: 850px;
     margin: auto;
+    display: inline-block;
 }
 
 canvas {
@@ -41,16 +42,12 @@ div#menu a:hover {
     color:red;
     border: 1px solid red;
 }
-<<<<<<< HEAD
 /*MENU END*/
-div#score, div#lvl{
-=======
-
-#score, #lvl, #lives{
->>>>>>> f3448220f81a9bbba792e7e9de694bcd834be678
+#info,#points, #lvl, #lives{
     display: inline-block;
     color:#0067FF;
     width:10%;
     vertical-align :top;
     text-align :center;
 }
+

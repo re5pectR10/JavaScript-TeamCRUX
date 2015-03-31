@@ -110,7 +110,7 @@ function updatePoints(player) {
        if (el.rect.intersects(player.rect)) {
            player.points += 1;
            pointForRemove = el;
-           document.getElementById('score').innerHTML = 'Score: ' + player.points;
+           document.getElementById('points').innerHTML = 'Points: ' + player.points;
        }
        
     });
