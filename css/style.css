@@ -12,6 +12,20 @@ canvas {
     display: inline;
 
 }
+/*MENU*/
+div#menu {
+    display:block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    height: auto;
+    overflow: auto;
+    width: 100%;
+    background:#fff;
+}
 div#score, div#lvl{
     display: inline-block;
     color:#0067FF;
