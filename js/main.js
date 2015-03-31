@@ -1,6 +1,6 @@
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
-
+var score = 0;
 var _cellSize = 50;
 var field = [];
 var enemies = [];
@@ -57,16 +57,18 @@ function updatePoints(player) {
     var pointForRemove;
     points.forEach(function(el) {
        if (el.rect.intersects(player.rect)) {
-           player.points += 10;
+           player.points += 1;
            pointForRemove = el;
+           score = player.points;
        }
+       
     });
 
     if (pointForRemove) {
         points.removeAt(points.indexOf(pointForRemove));
     }
+    document.getElementById('score').innerHTML = 'Score: ' + score;
 }
-
 function checkDead(player) {
     enemies.forEach(function(el) {
        if (el.rect.intersects(player.rect)) {
