@@ -327,7 +327,7 @@ function render(ctx) {
     player.animation.draw(ctx);
 }
 
-function reser() {
+function reset() {
     field = [];
     enemies = [];
     points = [];
@@ -337,6 +337,7 @@ function reser() {
     fillBonuses();
     player.reset();
     player.setStartPosition();
+    level = 0;
 }
 
 update();

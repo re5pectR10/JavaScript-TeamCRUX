@@ -27,11 +27,13 @@ function hide(el) {
 document.querySelector('.play').addEventListener('click', function () {
     hide(menu);
     initEnemies();
-    
+    reset();
+
 
 });
 document.querySelector('.new').addEventListener('click', function () {
     hide(endGame);
+    reset();
 
 
 });
