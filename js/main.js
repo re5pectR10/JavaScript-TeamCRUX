@@ -139,9 +139,11 @@ function updateBonuses(player) {
         }
     }
 }
+
 function showResult(el) {
     el.style.display = 'block';
 }
+
 function checkDead(player) {
     enemies.forEach(function(el) {
        if (el.rect.intersects(player.rect)) {
@@ -153,10 +155,13 @@ function checkDead(player) {
                if (player.lives == 0) {
                    // end game
                    showResult(endGame);
-                   player.lives += 3;
                    
                } else {
                    player.lives--;
+                   enemies.forEach(function(el) {
+                        el.position = new Vector2(700, 50);
+                   });
+
                    player.setStartPosition();
                }
            }
@@ -321,6 +326,19 @@ function render(ctx) {
     });
     player.animation.draw(ctx);
 }
+
+function reser() {
+    field = [];
+    enemies = [];
+    points = [];
+    bonuses = [];
+    initField();
+    initEnemies();
+    fillBonuses();
+    player.reset();
+    player.setStartPosition();
+}
+
 update();
 initField();
 fillBonuses();

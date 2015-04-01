@@ -13,6 +13,12 @@ var Player = (function() {
         this.animation.position = this.position;
     }
 
+    Player.prototype.reset = function() {
+        this.points = 0;
+        this.lives = 3;
+        this.powerMode = false;
+    };
+
     Player.prototype.setStartPosition = function() {
         this.position = new Vector2(55, 55);
     };
