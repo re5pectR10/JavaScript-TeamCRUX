@@ -318,5 +318,4 @@ function render(ctx) {
 
 initField();
 fillBonuses();
-initEnemies();
 update();
