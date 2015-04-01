@@ -47,7 +47,6 @@ function initField() {
         }
     }
 
-    level++;
     lvl.innerHTML = "Level: " + level;
 }
 
@@ -103,6 +102,7 @@ function updatePoints(player) {
     if (points.length == 0) {
         initField();
         fillBonuses();
+        level++;
         player.setStartPosition();
     }
 
