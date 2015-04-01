@@ -332,15 +332,14 @@ function reset() {
     enemies = [];
     points = [];
     bonuses = [];
+    level = 0;
     initField();
     initEnemies();
     fillBonuses();
     player.reset();
     player.setStartPosition();
-    level = 0;
 }
 
+
 update();
-initField();
-fillBonuses();
 

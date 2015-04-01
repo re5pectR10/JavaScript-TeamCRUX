@@ -26,7 +26,6 @@ function hide(el) {
  */
 document.querySelector('.play').addEventListener('click', function () {
     hide(menu);
-    initEnemies();
     reset();
 
 
