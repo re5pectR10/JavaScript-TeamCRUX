@@ -110,9 +110,10 @@ function updatePoints(player) {
        if (el.rect.intersects(player.rect)) {
            player.points += 1;
            pointForRemove = el;
-           document.getElementById('points').innerHTML = 'Points: ' + player.points;
        }
-       
+           document.getElementById('points').innerHTML = 'Points: ' + player.points;
+           document.getElementById('result').innerHTML = 'Your result is: ' + player.points + ' points';
+            
     });
 
     if (pointForRemove) {
@@ -138,7 +139,9 @@ function updateBonuses(player) {
         }
     }
 }
-
+function showResult(el) {
+    el.style.display = 'block';
+}
 function checkDead(player) {
     enemies.forEach(function(el) {
        if (el.rect.intersects(player.rect)) {
@@ -149,6 +152,9 @@ function checkDead(player) {
            } else {
                if (player.lives == 0) {
                    // end game
+                   showResult(endGame);
+                   player.lives += 3;
+                   
                } else {
                    player.lives--;
                    player.setStartPosition();
@@ -315,7 +321,7 @@ function render(ctx) {
     });
     player.animation.draw(ctx);
 }
-
+update();
 initField();
 fillBonuses();
-update();
+
