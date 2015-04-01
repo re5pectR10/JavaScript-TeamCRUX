@@ -11,7 +11,7 @@ var possibleMoves, currentMove, forbiddenMove, powerModeStartTime, level = 0;
 var input = new Input();
 attachListeners(input);
 
-var player = new Player(50, 50, 45, 'assets/pacman.png', 0, 2);
+var player = new Player(255, 255, 45, 'assets/pacman.png', 0, 2);
 
 /* initialize the field */
 function initField() {

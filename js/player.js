@@ -20,7 +20,7 @@ var Player = (function() {
     };
 
     Player.prototype.setStartPosition = function() {
-        this.position = new Vector2(55, 55);
+        this.position = new Vector2(255, 255);
     };
 
     Player.prototype.move = function(width) {
