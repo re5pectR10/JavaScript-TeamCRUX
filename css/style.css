@@ -5,6 +5,7 @@ body {
 #canvas-container {
     width: 850px;
     margin: auto;
+    display: inline-block;
 }
 
 canvas {
@@ -41,11 +42,44 @@ div#menu a:hover {
     color:red;
     border: 1px solid red;
 }
+/*MENU END*/
+/*END Game*/
+div#end-game {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    height: auto;
+    overflow: auto;
+    width: 100%;
+    background:#000;
+    text-align :center ;
+    color:#0067FF;
+}
 
-#score, #lvl, #lives, #bullets{
+div#end-game a {
+    font-size: 2rem;
+    text-decoration: none;
+    color:green;
+    border:1px solid green;
+    padding:5px;
+
+}
+
+div#end-game a:hover {
+    color:red;
+    border: 1px solid red;
+}
+/*END Game*/
+
+#info,#points, #lvl, #lives, #bullets{
     display: inline-block;
     color:#0067FF;
     width:10%;
     vertical-align :top;
     text-align :center;
 }
+

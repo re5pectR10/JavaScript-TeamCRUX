@@ -12,8 +12,9 @@ var possibleMoves, currentMove, forbiddenMove, powerModeStartTime, level = 0;
 var input = new Input();
 attachListeners(input);
 
-var player = new Player(50, 50, 45, 'assets/pacman.png', 0, 2);
-//var pla = new Player(250, 250, 45, 'assets/pacman.png', 0, 2);
+var player = new Player(255, 255, 45, 'assets/pacman.png', 0, 2);
+
+/* initialize the field */
 function initField() {
     for (var i = 0; i < canvas.width / _cellSize; i++) {
         for (var j = 0; j < canvas.height / _cellSize; j++) {
@@ -137,9 +138,10 @@ function updatePoints(player) {
        if (el.rect.intersects(player.rect)) {
            player.points += 1;
            pointForRemove = el;
-           document.getElementById('score').innerHTML = 'Score: ' + player.points;
        }
-       
+           document.getElementById('points').innerHTML = 'Points: ' + player.points;
+           document.getElementById('result').innerHTML = 'Your result is: ' + player.points + ' points';
+            
     });
 
     if (pointForRemove) {
@@ -177,6 +179,10 @@ function updateBonuses(player) {
     }
 }
 
+function showResult(el) {
+    el.style.display = 'block';
+}
+
 function checkDead(player) {
     enemies.forEach(function(el) {
        if (el.rect.intersects(player.rect)) {
@@ -187,8 +193,14 @@ function checkDead(player) {
            } else {
                if (player.lives == 0) {
                    // end game
+                   showResult(endGame);
+                   
                } else {
                    player.lives--;
+                   enemies.forEach(function(el) {
+                        el.position = new Vector2(700, 50);
+                   });
+
                    player.setStartPosition();
                }
            }
@@ -361,7 +373,19 @@ function render(ctx) {
     });
 }
 
-initField();
-fillBonuses();
-initEnemies();
+function reset() {
+    field = [];
+    enemies = [];
+    points = [];
+    bonuses = [];
+    level = 0;
+    initField();
+    initEnemies();
+    fillBonuses();
+    player.reset();
+    player.setStartPosition();
+}
+
+
 update();
+
