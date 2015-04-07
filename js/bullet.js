@@ -1,22 +1,35 @@
-var Ghost = (function() {
-    function Ghost(x, y, size, spritePath, col, allCols) {
-        this.position = new Vector2(x, y);
-        this.speed = 5;
-        this.width = size;
-        this.height = size;
-        this.ghostType = col;
-        this.powerMode = false;
+var Bullet = (function() {
+    function Bullet(x , y, animationRow) {
+        this.position = new Vector2(x + 7, y + 7);
+        this.speed = 10;
+        this.width = _cellSize - 14;
+        this.height = _cellSize - 14;
         this.movement = {right: false, left: false, up: false, down: false};
-        this.rect = new Rectangle(x, y, this.width, this.height);
-        this.animation = new Animation(this.width, this.height, 0, col, 2, spritePath, 4, allCols, 4);
+        var col;
+        switch (animationRow) {
+            case 2:
+                this.movement.left = true;
+                col = 0;
+                break;
+            case 3:
+                this.movement.up = true;
+                col = 3;
+                break;
+            case 1:
+                this.movement.down = true;
+                col = 2;
+                break;
+            case 0:
+                this.movement.right = true;
+                col = 1;
+                break;
+        }
+        this.rect = new Rectangle(this.position.x, this.position.y, this.width, this.height);
+        this.animation = new Animation(this.width, this.height, 0, col, 1, 'assets/bullets.png', 1, 4, 1);
         this.animation.position = this.position;
     }
 
-    Ghost.prototype.setDefaultPosition = function() {
-        this.position = new Vector2(700, 50);
-    };
-
-    Ghost.prototype.move = function(width) {
+    Bullet.prototype.move = function() {
         if (this.movement.left) {
             this.position.move(new Vector2(-this.speed, 0));
         } else if (this.movement.right) {
@@ -50,15 +63,5 @@ var Ghost = (function() {
         this.rect.y = this.position.y;
     };
 
-    Ghost.prototype.setPowerMode = function() {
-        this.animation.setColumn(12);
-        this.powerMode = true;
-    };
-
-    Ghost.prototype.unsetPowerMode = function() {
-        this.animation.setColumn(this.ghostType);
-        this.powerMode = false;
-    };
-
-    return Ghost;
+    return Bullet;
 }());

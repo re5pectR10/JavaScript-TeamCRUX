@@ -42,7 +42,7 @@ div#menu a:hover {
     border: 1px solid red;
 }
 
-#score, #lvl, #lives{
+#score, #lvl, #lives, #bullets{
     display: inline-block;
     color:#0067FF;
     width:10%;

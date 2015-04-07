@@ -3,6 +3,7 @@ var ctx = canvas.getContext('2d');
 
 var playerLives = document.getElementById('lives');
 var lvl = document.getElementById('lvl');
+var playerBullets = document.getElementById('bullets');
 
 var _cellSize = 50;
 var field = [], enemies = [], points = [], bonuses = [];
@@ -12,8 +13,7 @@ var input = new Input();
 attachListeners(input);
 
 var player = new Player(50, 50, 45, 'assets/pacman.png', 0, 2);
-
-/* initialize the field */
+//var pla = new Player(250, 250, 45, 'assets/pacman.png', 0, 2);
 function initField() {
     for (var i = 0; i < canvas.width / _cellSize; i++) {
         for (var j = 0; j < canvas.height / _cellSize; j++) {
@@ -71,7 +71,9 @@ function update() {
     movement(player);
     updatePoints(player);
     updateBonuses(player);
+    updateBullets(player);
     playerLives.innerHTML = "Lives: " + player.lives;
+    playerBullets.innerHTML = "Bullets: " + player.bullets;
 
     if (powerModeStartTime + 7 < new Date().getTime() / 1000) {
         disablePowerMode(player);
@@ -95,6 +97,31 @@ function disablePowerMode(player) {
         el.unsetPowerMode();
         player.powerMode = false;
     });
+}
+
+function updateBullets(player) {
+    var bulletForRemove;
+    player.firedBullets.forEach(function(bullet) {
+        bullet.move();
+        enemies.forEach(function(enemie) {
+            if (enemie.rect.intersects(bullet.rect)) {
+                enemie.setDefaultPosition();
+                enemie.unsetPowerMode();
+                player.points += 5;
+                bulletForRemove = bullet;
+            }
+        });
+
+        field.forEach(function(el) {
+            if (el.rect.intersects(bullet.rect)) {
+                bulletForRemove = bullet;
+            }
+        })
+    });
+
+    if (bulletForRemove) {
+        player.firedBullets.removeAt(player.firedBullets.indexOf(bulletForRemove));
+    }
 }
 
 function updatePoints(player) {
@@ -125,8 +152,19 @@ function updateBonuses(player) {
 
     bonuses.forEach(function(el) {
         if (el.rect.intersects(player.rect)) {
-            enablePowerMode(player);
-            powerModeStartTime = new Date().getTime() / 1000;
+            switch (Math.floor(Math.random() * 3)) {
+                case 0:
+                    enablePowerMode(player);
+                    powerModeStartTime = new Date().getTime() / 1000;
+                    break;
+                case 1:
+                    player.lives++;
+                    break;
+                case 2:
+                    player.bullets += 3;
+                    break;
+            }
+
             bonusForRemove = el;
         }
     });
@@ -143,7 +181,7 @@ function checkDead(player) {
     enemies.forEach(function(el) {
        if (el.rect.intersects(player.rect)) {
            if (player.powerMode && el.powerMode) {
-               el.position = new Vector2(700, 50);
+               el.setDefaultPosition();
                el.unsetPowerMode();
                player.points += 5;
            } else {
@@ -236,6 +274,7 @@ function movement(player) {
     input.right ? player.movement.right = true : player.movement.right = false;
     input.up ? player.movement.up = true : player.movement.up = false;
     input.down ? player.movement.down = true : player.movement.down = false;
+    input.space ? player.shoot = true : player.shoot = false;
 
     var cantMove = checkMove(player);
     for (var move in cantMove) {
@@ -243,7 +282,7 @@ function movement(player) {
     }
 
     updateAnimationDirection(player);
-    player.move(canvas.width);
+    player.move();
 }
 
 function updateAnimationDirection(player) {
@@ -294,6 +333,9 @@ function tick() {
     bonuses.forEach(function(el) {
         el.animation.update();
     });
+    player.firedBullets.forEach(function(el) {
+        el.animation.update();
+    });
 }
 
 function render(ctx) {
@@ -314,6 +356,9 @@ function render(ctx) {
         el.animation.draw(ctx);
     });
     player.animation.draw(ctx);
+    player.firedBullets.forEach(function(el) {
+       el.animation.draw(ctx);
+    });
 }
 
 initField();

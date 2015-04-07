@@ -6,6 +6,11 @@ var Player = (function() {
         this.height = size;
         this.points = 0;
         this.lives = 3;
+
+        this.bullets = 3;
+        this.firedBullets = [];
+        this.bulletFireTime = 0;
+        this.shoot = false;
         this.powerMode = false;
         this.movement = {right: false, left: false, up: false, down: false};
         this.rect = new Rectangle(x, y, this.width, this.height);
@@ -17,7 +22,7 @@ var Player = (function() {
         this.position = new Vector2(55, 55);
     };
 
-    Player.prototype.move = function(width) {
+    Player.prototype.move = function() {
         if (this.movement.left) {
             this.position.move(new Vector2(-this.speed, 0));
         } else if (this.movement.right) {
@@ -44,6 +49,12 @@ var Player = (function() {
 
         if (this.position.x < 0) {
             this.position.x = canvas.width - 5;
+        }
+
+        if (this.shoot && this.bullets > 0 && this.bulletFireTime + 1 < new Date().getTime() / 1000) {
+            this.firedBullets.push(new Bullet(this.position.x, this.position.y, this.animation.row));
+            this.bullets--;
+            this.bulletFireTime = new Date().getTime() / 1000;
         }
 
         this.animation.position = this.position;
