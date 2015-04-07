@@ -6,15 +6,18 @@ var Player = (function() {
         this.height = size;
         this.points = 0;
         this.lives = 3;
-
+        this.startPositionX = x;
+        this.startPositionY = y;
         this.bullets = 3;
         this.firedBullets = [];
         this.bulletFireTime = 0;
+        this.powerModeStartTime = 0;
         this.shoot = false;
         this.powerMode = false;
         this.movement = {right: false, left: false, up: false, down: false};
         this.rect = new Rectangle(x, y, this.width, this.height);
         this.animation = new Animation(this.width, this.height, 0, col, 2, spritePath, 4, allCols, 4);
+        this.powerModeAnimation = new Animation(this.width + 56, this.height + 56, 0, 0, 20, 'assets/particles.png', 22, 5, 4);
         this.animation.position = this.position;
     }
 
@@ -24,8 +27,12 @@ var Player = (function() {
         this.powerMode = false;
     };
 
+    Player.prototype.powerModeAnimationUpdatePosition = function() {
+        this.powerModeAnimation.position = new Vector2(this.position.x - 28, this.position.y - 28);
+    };
+
     Player.prototype.setStartPosition = function() {
-        this.position = new Vector2(255, 255);
+        this.position = new Vector2(this.startPositionX, this.startPositionY);
     };
 
     Player.prototype.move = function() {

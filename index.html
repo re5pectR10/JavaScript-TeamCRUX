@@ -11,13 +11,14 @@
 <!--adding a menu-->
 <div id="menu">
     <h1>Welcome to CRUX Man Game</h1>
-    <a href="#" class="play">Start the game</a>
+    <a href="#" class="play" data-players-count="1">1Player</a>
+    <a href="#" class="play" data-players-count="2">2 Players</a>
 </div>
 <div id="end-game">
     <h2>Game Over</h2>
     <p id="result"></p>
-    <a href="#" class="new">Start new game</a>
-
+    <a href="#" class="new" data-players-count="1">1Player</a>
+    <a href="#" class="new" data-players-count="2">2 Players</a>
 </div>
 <div id="canvas-container">
     <canvas id="canvas" width="850" height="650">
@@ -25,18 +26,30 @@
     </canvas>
 </div>
 
-<div id="info">
+<div class="info">
     <div>
-        <h2 id="points">Points:</h2>
+        <h2 class="points">Points:</h2>
     </div>
     <div>
-        <h2 id="lives">Lives:</h2>
+        <h2 class="lives">Lives:</h2>
     </div>
     <div>
         <h2 id="lvl">Level:</h2>
     </div>
     <div>
-        <h2 id="bullets">Bullets:</h2>
+        <h2 class="bullets">Bullets:</h2>
+    </div>
+</div>
+
+<div class="info">
+    <div>
+        <h2 class="points">Points:</h2>
+    </div>
+    <div>
+        <h2 class="lives">Lives:</h2>
+    </div>
+    <div>
+        <h2 class="bullets">Bullets:</h2>
     </div>
 </div>
 

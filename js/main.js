@@ -1,20 +1,21 @@
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
-var playerLives = document.getElementById('lives');
+var playerLives = document.querySelectorAll('.lives');
 var lvl = document.getElementById('lvl');
-var playerBullets = document.getElementById('bullets');
+var playerBullets = document.querySelectorAll('.bullets');
+var playersPoints = document.querySelectorAll('.points');
 
 var _cellSize = 50;
 var field = [], enemies = [], points = [], bonuses = [];
-var possibleMoves, currentMove, forbiddenMove, powerModeStartTime, level = 0;
+var possibleMoves, currentMove, forbiddenMove, level = 0, twoPlayer = false;
 
 var input = new Input();
 attachListeners(input);
 
-var player = new Player(255, 255, 45, 'assets/pacman.png', 0, 2);
+var players = [];
+players.push(new Player(255, 255, 45, 'assets/pacman.png', 0, 2));
 
-/* initialize the field */
 function initField() {
     for (var i = 0; i < canvas.width / _cellSize; i++) {
         for (var j = 0; j < canvas.height / _cellSize; j++) {
@@ -68,22 +69,40 @@ function fillBonuses() {
 function update() {
     tick();
     render(ctx);
-    checkDead(player);
-    movement(player);
-    updatePoints(player);
-    updateBonuses(player);
-    updateBullets(player);
-    playerLives.innerHTML = "Lives: " + player.lives;
-    playerBullets.innerHTML = "Bullets: " + player.bullets;
-
-    if (powerModeStartTime + 7 < new Date().getTime() / 1000) {
-        disablePowerMode(player);
+    movement(players[0], true);
+    if (twoPlayer) {
+        movement(players[1], false);
     }
 
+    players.forEach(function(player) {
+        checkDead(player);
+        updatePoints(player);
+        updateBonuses(player);
+        updateBullets(player);
+        updatePowerMode(player);
+    });
+
+    updateStats(players);
     enemies.forEach(function(el) {
        AI(el);
     });
+
     requestAnimationFrame(update);
+}
+
+function updateStats(players) {
+    for (var i = 0; i < players.length; i++) {
+        playerLives[i].innerHTML = "Lives: " + players[i].lives;
+        playerBullets[i].innerHTML = "Bullets: " + players[i].bullets;
+        playersPoints[i].innerHTML = 'Points: ' + players[i].points;
+    }
+}
+
+function updatePowerMode(player) {
+    if (player.powerModeStartTime + 7 < new Date().getTime() / 1000) {
+        disablePowerMode(player);
+        player.powerMode = false;
+    }
 }
 
 function enablePowerMode(player) {
@@ -109,6 +128,15 @@ function updateBullets(player) {
                 enemie.setDefaultPosition();
                 enemie.unsetPowerMode();
                 player.points += 5;
+                bulletForRemove = bullet;
+            }
+        });
+
+        players.forEach(function(el) {
+            if (el !== player && el.rect.intersects(bullet.rect)) {
+                el.setStartPosition();
+                player.points += 10;
+                el.lives--;
                 bulletForRemove = bullet;
             }
         });
@@ -139,9 +167,8 @@ function updatePoints(player) {
            player.points += 1;
            pointForRemove = el;
        }
-           document.getElementById('points').innerHTML = 'Points: ' + player.points;
-           document.getElementById('result').innerHTML = 'Your result is: ' + player.points + ' points';
-            
+
+       document.getElementById('result').innerHTML = 'Your result is: ' + player.points + ' points';
     });
 
     if (pointForRemove) {
@@ -154,10 +181,11 @@ function updateBonuses(player) {
 
     bonuses.forEach(function(el) {
         if (el.rect.intersects(player.rect)) {
-            switch (Math.floor(Math.random() * 3)) {
+            switch (0/*Math.floor(Math.random() * 3)*/) {
                 case 0:
                     enablePowerMode(player);
-                    powerModeStartTime = new Date().getTime() / 1000;
+                    player.powerMode = true;
+                    player.powerModeStartTime = new Date().getTime() / 1000;
                     break;
                 case 1:
                     player.lives++;
@@ -183,6 +211,29 @@ function showResult(el) {
     el.style.display = 'block';
 }
 
+function checkPlayersCollision(player) {
+    players.forEach(function(el) {
+       if (el !== player) {
+           if (el.rect.intersects(player.rect)) {
+               if (!player.powerMode && !el.powerMode) {
+                   player.lives--;
+                   player.setStartPosition();
+                   el.lives--;
+                   el.setStartPosition();
+               } else if (!player.powerMode) {
+                   player.lives--;
+                   player.setStartPosition();
+                   el.points += 10;
+               } else if (!el.powerMode) {
+                   el.lives--;
+                   el.setStartPosition();
+                   player.points += 10;
+               }
+           }
+       }
+    });
+}
+
 function checkDead(player) {
     enemies.forEach(function(el) {
        if (el.rect.intersects(player.rect)) {
@@ -206,6 +257,8 @@ function checkDead(player) {
            }
        }
     });
+
+    checkPlayersCollision(player);
 }
 
 function AI(enemy) {
@@ -281,12 +334,15 @@ Object.size = function(obj) {
     return size;
 };
 
-function movement(player) {
-    input.left ? player.movement.left = true : player.movement.left = false;
-    input.right ? player.movement.right = true : player.movement.right = false;
-    input.up ? player.movement.up = true : player.movement.up = false;
-    input.down ? player.movement.down = true : player.movement.down = false;
-    input.space ? player.shoot = true : player.shoot = false;
+function movement(player, onePlayer) {
+    var keys;
+    onePlayer ? keys = ['left', 'right', 'up', 'down', 'space'] : keys = ['a', 'd', 'w', 's', 'f'];
+
+    input[keys[0]] ? player.movement.left = true : player.movement.left = false;
+    input[keys[1]] ? player.movement.right = true : player.movement.right = false;
+    input[keys[2]] ? player.movement.up = true : player.movement.up = false;
+    input[keys[3]] ? player.movement.down = true : player.movement.down = false;
+    input[keys[4]] ? player.shoot = true : player.shoot = false;
 
     var cantMove = checkMove(player);
     for (var move in cantMove) {
@@ -332,20 +388,31 @@ function checkMove(player) {
 }
 
 function tick() {
-    player.animation.update();
+    players.forEach(function(player) {
+        if (player.powerMode) {
+            player.powerModeAnimationUpdatePosition();
+            player.powerModeAnimation.update();
+        }
+
+        player.animation.update();
+        player.firedBullets.forEach(function(el) {
+            el.animation.update();
+        });
+    });
+
     enemies.forEach(function(el){
        el.animation.update();
     });
+
     field.forEach(function(el){
        el.animation.update();
     });
+
     points.forEach(function(el) {
         el.animation.update();
     });
+
     bonuses.forEach(function(el) {
-        el.animation.update();
-    });
-    player.firedBullets.forEach(function(el) {
         el.animation.update();
     });
 }
@@ -367,9 +434,15 @@ function render(ctx) {
     enemies.forEach(function(el){
         el.animation.draw(ctx);
     });
-    player.animation.draw(ctx);
-    player.firedBullets.forEach(function(el) {
-       el.animation.draw(ctx);
+    players.forEach(function(player) {
+        if (player.powerMode) {
+            player.powerModeAnimation.draw(ctx);
+        }
+
+        player.animation.draw(ctx);
+        player.firedBullets.forEach(function(el) {
+            el.animation.draw(ctx);
+        });
     });
 }
 
@@ -382,10 +455,16 @@ function reset() {
     initField();
     initEnemies();
     fillBonuses();
-    player.reset();
-    player.setStartPosition();
+    if (twoPlayer && players.length == 1) {
+        players.push(new Player(555, 455, 45, 'assets/pacman2.png', 0, 2));
+    } else if (!twoPlayer && players.length == 2) {
+        players.removeAt(1);
+    }
+
+    players.forEach(function(player) {
+        player.reset();
+        player.setStartPosition();
+    });
 }
 
-
 update();
-

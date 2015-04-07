@@ -24,16 +24,26 @@ function hide(el) {
 /**
  * Click handlers for the different menu screens
  */
-document.querySelector('.play').addEventListener('click', function () {
-    hide(menu);
-    reset();
+var play = document.querySelectorAll('.play');
+var newPlay = document.querySelectorAll('.new');
 
+function addListeners(item, menu) {
+    for (var i = 0; i < item.length; i++) {
+        item[i].addEventListener('click', function () {
+            this.getAttribute('data-players-count') == '1' ? twoPlayer = false : twoPlayer = true;
+            if (twoPlayer) {
+                document.getElementsByClassName('info')[1].style.visibility = 'visible';
+                document.getElementById('lvl').style.display = 'none';
+            } else {
+                document.getElementsByClassName('info')[1].style.visibility = 'hidden';
+                document.getElementById('lvl').style.display = 'inline';
+            }
 
-});
-document.querySelector('.new').addEventListener('click', function () {
-    hide(endGame);
-    reset();
+            hide(menu);
+            reset();
+        });
+    }
+}
 
-
-});
-
+addListeners(newPlay, endGame);
+addListeners(play, menu);
