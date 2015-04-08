@@ -1,6 +1,7 @@
 var Player = (function() {
-    function Player(x, y, size, spritePath, col, allCols) {
+    function Player(x, y, id, size, spritePath, col, allCols) {
         this.position = new Vector2(x, y);
+        this.ID = id;
         this.speed = 5;
         this.width = size;
         this.height = size;
@@ -64,7 +65,7 @@ var Player = (function() {
             this.position.x = canvas.width - 5;
         }
 
-        if (this.shoot && this.bullets > 0 && this.bulletFireTime + 1 < new Date().getTime() / 1000) {
+        if (this.shoot && this.bullets > 0 && this.bulletFireTime + 0.5 < new Date().getTime() / 1000) {
             this.firedBullets.push(new Bullet(this.position.x, this.position.y, this.animation.row));
             this.bullets--;
             this.bulletFireTime = new Date().getTime() / 1000;

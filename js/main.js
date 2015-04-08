@@ -5,6 +5,7 @@ var playerLives = document.querySelectorAll('.lives');
 var lvl = document.getElementById('lvl');
 var playerBullets = document.querySelectorAll('.bullets');
 var playersPoints = document.querySelectorAll('.points');
+var finalResults = document.querySelectorAll('.result');
 
 var _cellSize = 50;
 var field = [], enemies = [], points = [], bonuses = [];
@@ -14,7 +15,6 @@ var input = new Input();
 attachListeners(input);
 
 var players = [];
-players.push(new Player(255, 255, 45, 'assets/pacman.png', 0, 2));
 
 function initField() {
     for (var i = 0; i < canvas.width / _cellSize; i++) {
@@ -69,17 +69,17 @@ function fillBonuses() {
 function update() {
     tick();
     render(ctx);
-    movement(players[0], true);
-    if (twoPlayer) {
-        movement(players[1], false);
-    }
-
     players.forEach(function(player) {
-        checkDead(player);
+        checkEnemyCollision(player);
         updatePoints(player);
         updateBonuses(player);
         updateBullets(player);
         updatePowerMode(player);
+        if (player.ID == 0) {
+            movement(player, true);
+        } else {
+            movement(player, false);
+        }
     });
 
     updateStats(players);
@@ -91,31 +91,31 @@ function update() {
 }
 
 function updateStats(players) {
-    for (var i = 0; i < players.length; i++) {
-        playerLives[i].innerHTML = "Lives: " + players[i].lives;
-        playerBullets[i].innerHTML = "Bullets: " + players[i].bullets;
-        playersPoints[i].innerHTML = 'Points: ' + players[i].points;
-    }
+    players.forEach(function(el) {
+        playerLives[el.ID].innerHTML = "Lives: " + el.lives;
+        playerBullets[el.ID].innerHTML = "Bullets: " + el.bullets;
+        playersPoints[el.ID].innerHTML = 'Points: ' + el.points;
+        finalResults[el.ID].innerHTML = 'Your result is: ' + el.points + ' points'
+    });
 }
 
 function updatePowerMode(player) {
-    if (player.powerModeStartTime + 7 < new Date().getTime() / 1000) {
+    if (player.powerMode && player.powerModeStartTime + 7 < new Date().getTime() / 1000) {
         disablePowerMode(player);
-        player.powerMode = false;
     }
 }
 
 function enablePowerMode(player) {
+    player.powerMode = true;
     enemies.forEach(function(el) {
         el.setPowerMode();
-        player.powerMode = true;
     });
 }
 
 function disablePowerMode(player) {
+    player.powerMode = false;
     enemies.forEach(function(el) {
         el.unsetPowerMode();
-        player.powerMode = false;
     });
 }
 
@@ -167,8 +167,6 @@ function updatePoints(player) {
            player.points += 1;
            pointForRemove = el;
        }
-
-       document.getElementById('result').innerHTML = 'Your result is: ' + player.points + ' points';
     });
 
     if (pointForRemove) {
@@ -181,10 +179,9 @@ function updateBonuses(player) {
 
     bonuses.forEach(function(el) {
         if (el.rect.intersects(player.rect)) {
-            switch (0/*Math.floor(Math.random() * 3)*/) {
+            switch (Math.floor(Math.random() * 3)) {
                 case 0:
                     enablePowerMode(player);
-                    player.powerMode = true;
                     player.powerModeStartTime = new Date().getTime() / 1000;
                     break;
                 case 1:
@@ -234,7 +231,7 @@ function checkPlayersCollision(player) {
     });
 }
 
-function checkDead(player) {
+function checkEnemyCollision(player) {
     enemies.forEach(function(el) {
        if (el.rect.intersects(player.rect)) {
            if (player.powerMode && el.powerMode) {
@@ -242,58 +239,31 @@ function checkDead(player) {
                el.unsetPowerMode();
                player.points += 5;
            } else {
-               if (player.lives == 0) {
-                   // end game
-                   showResult(endGame);
-                   
-               } else {
-                   player.lives--;
-                   enemies.forEach(function(el) {
-                        el.position = new Vector2(700, 50);
-                   });
+               player.lives--;
+               enemies.forEach(function(el) {
+                   el.position = new Vector2(700, 50);
+               });
 
-                   player.setStartPosition();
-               }
+               player.setStartPosition();
            }
        }
     });
 
     checkPlayersCollision(player);
+    checkDead(player);
+}
+
+function checkDead(player) {
+    if (player.lives < 0) {
+        players.removeAt(players.indexOf(player));
+    }
+
+    if (players.length === 0) {
+        showResult(endGame);
+    }
 }
 
 function AI(enemy) {
-   /* if (
-        ((enemy.movement['up'] === false && enemy.movement['down'] === false) || (enemy.movement['right'] === false && enemy.movement['left'] === false))) {
-       // do {
-            //enemy.movement['up'] = false;
-            //enemy.movement['left'] = false;
-            //enemy.movement['right'] = false;
-           // enemy.movement['down'] = false;
-
-        if (Math.abs(timeDiff - new Date().getTime()/1000) > 2) {
-            enemy. movement.left = !enemy. movement.left;
-            enemy. movement.right = !enemy. movement.left;
-        }
-        if (Math.abs(timeDiff - new Date().getTime()/1000) > 3) {
-            enemy. movement.up = !enemy. movement.up;
-            enemy. movement.down = !enemy. movement.up;
-        }
-
-        if (enemy.movement['down'] === false && enemy.movement['up'] === false) {
-            enemy.movement[Object.keys(enemy.movement)[Math.floor(Math.random() * 2) + 2]] = true;
-        }
-        if (enemy.movement['left'] === false && enemy.movement['right'] === false) {
-            enemy.movement[Object.keys(enemy.movement)[Math.floor(Math.random() * 2)]] = true;
-        }
-            //enemy.movement[Object.keys(enemy.movement)[Math.floor(Math.random() * 4)]] = true;
-            //console.log(Object.keys(enemy.movement)[Math.floor(Math.random() * 4)]);
-
-       // } while (enemy.movement['up'] === false && enemy.movement['left'] === false && enemy.movement['right'] === false && enemy.movement['down'] === false)
-
-
-        timeDiff = new Date().getTime() / 1000;
-    }*/
-
    for (var key in enemy.movement) {
        if (enemy.movement[key] === true) {
            currentMove = key;
@@ -323,7 +293,7 @@ function AI(enemy) {
 
    enemy.movement[currentMove] = false;
    enemy.movement[Object.keys(possibleMoves)[Math.floor(Math.random() * (Object.size(possibleMoves) - 1))]] = true;
-   enemy.move(canvas.width);
+   enemy.move();
 }
 
 Object.size = function(obj) {
@@ -455,8 +425,12 @@ function reset() {
     initField();
     initEnemies();
     fillBonuses();
-    if (twoPlayer && players.length == 1) {
-        players.push(new Player(555, 455, 45, 'assets/pacman2.png', 0, 2));
+    if (players.length === 0) {
+        players.push(new Player(255, 255, 0, 45, 'assets/pacman.png', 0, 2));
+    }
+
+    if (twoPlayer && players.length === 1) {
+        players.push(new Player(555, 455, 1, 45, 'assets/pacman2.png', 0, 2));
     } else if (!twoPlayer && players.length == 2) {
         players.removeAt(1);
     }

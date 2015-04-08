@@ -33,8 +33,10 @@ function addListeners(item, menu) {
             this.getAttribute('data-players-count') == '1' ? twoPlayer = false : twoPlayer = true;
             if (twoPlayer) {
                 document.getElementsByClassName('info')[1].style.visibility = 'visible';
+                document.getElementsByClassName('result')[1].style.visibility = 'visible';
                 document.getElementById('lvl').style.display = 'none';
             } else {
+                document.getElementsByClassName('result')[1].style.visibility = 'hidden';
                 document.getElementsByClassName('info')[1].style.visibility = 'hidden';
                 document.getElementById('lvl').style.display = 'inline';
             }

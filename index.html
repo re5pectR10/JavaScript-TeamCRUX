@@ -9,47 +9,53 @@
 <body>
 
 <!--adding a menu-->
-<div id="menu">
-    <h1>Welcome to CRUX Man Game</h1>
-    <a href="#" class="play" data-players-count="1">1Player</a>
-    <a href="#" class="play" data-players-count="2">2 Players</a>
-</div>
-<div id="end-game">
-    <h2>Game Over</h2>
-    <p id="result"></p>
-    <a href="#" class="new" data-players-count="1">1Player</a>
-    <a href="#" class="new" data-players-count="2">2 Players</a>
-</div>
-<div id="canvas-container">
-    <canvas id="canvas" width="850" height="650">
-        Your browser doesn't support canvas
-    </canvas>
-</div>
+<div id="wrapper">
 
-<div class="info">
-    <div>
-        <h2 class="points">Points:</h2>
+    <div class="info">
+        <div>
+            <h3 class="points">Points:</h3>
+        </div>
+        <div>
+            <h3 class="lives">Lives:</h3>
+        </div>
+        <div>
+            <h3 id="lvl">Level:</h3>
+        </div>
+        <div>
+            <h3 class="bullets">Bullets:</h3>
+        </div>
     </div>
-    <div>
-        <h2 class="lives">Lives:</h2>
-    </div>
-    <div>
-        <h2 id="lvl">Level:</h2>
-    </div>
-    <div>
-        <h2 class="bullets">Bullets:</h2>
-    </div>
-</div>
 
-<div class="info">
-    <div>
-        <h2 class="points">Points:</h2>
+    <div id="menu">
+        <h1>Welcome to CRUX Man Game</h1>
+        <a href="#" class="play" data-players-count="1">1Player</a>
+        <a href="#" class="play" data-players-count="2">2 Players</a>
     </div>
-    <div>
-        <h2 class="lives">Lives:</h2>
+    <div id="end-game">
+        <h2>Game Over</h2>
+        <div class="result-container">
+            <p class="result"></p>
+            <p class="result"></p>
+        </div>
+        <a href="#" class="new" data-players-count="1">1Player</a>
+        <a href="#" class="new" data-players-count="2">2 Players</a>
     </div>
-    <div>
-        <h2 class="bullets">Bullets:</h2>
+    <div id="canvas-container">
+        <canvas id="canvas" width="850" height="650">
+            Your browser doesn't support canvas
+        </canvas>
+    </div>
+
+    <div class="info">
+        <div>
+            <h3 class="points">Points:</h3>
+        </div>
+        <div>
+            <h3 class="lives">Lives:</h3>
+        </div>
+        <div>
+            <h3 class="bullets">Bullets:</h3>
+        </div>
     </div>
 </div>
 

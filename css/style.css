@@ -2,6 +2,11 @@ body {
     background:#000;
 }
 
+#wrapper {
+    width: 1000px;
+    margin: auto;
+}
+
 #canvas-container {
     width: 850px;
     margin: auto;
@@ -13,7 +18,7 @@ canvas {
 }
 
 /*MENU*/
-div#menu {
+div#menu, div#end-game {
     display:block;
     position: absolute;
     top: 0;
@@ -46,18 +51,6 @@ div#menu a:hover {
 /*END Game*/
 div#end-game {
     display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: auto;
-    height: auto;
-    overflow: auto;
-    width: 100%;
-    background:#000;
-    text-align :center ;
-    color:#0067FF;
 }
 
 div#end-game a {
@@ -74,11 +67,33 @@ div#end-game a:hover {
 }
 /*END Game*/
 
-.info,.points, #lvl, .lives, .bullets{
+.info {
+    width: 71px;
     display: inline-block;
-    color:#0067FF;
-    width:20%;
+    vertical-align :top;
+    text-align :center;
+    padding: 0;
+}
+
+.points, #lvl, .lives, .bullets{
+    display: inline-block;
+    color: #fffe04;
     vertical-align :top;
     text-align :center;
 }
 
+.info:last-of-type .points, .info:last-of-type .lives, .info:last-of-type .bullets {
+    color: red;
+}
+
+.result {
+    display: inline-block;
+}
+
+.result:first-of-type {
+    color: #fffe04;
+}
+
+.result:last-of-type {
+    color: red;
+}

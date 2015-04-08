@@ -16,7 +16,7 @@ var Ghost = (function() {
         this.position = new Vector2(700, 50);
     };
 
-    Ghost.prototype.move = function(width) {
+    Ghost.prototype.move = function() {
         if (this.movement.left) {
             this.position.move(new Vector2(-this.speed, 0));
         } else if (this.movement.right) {
@@ -29,20 +29,20 @@ var Ghost = (function() {
             this.position.move(new Vector2(0, this.speed));
         }
 
-        if (this.position.y < 0) {
-            this.position.y = canvas.height;
+        if (this.position.y < 0 + this.speed) {
+            this.position.y = canvas.height - this.speed;
         }
 
-        if (this.position.y > canvas.height) {
-            this.position.y = 0;
+        if (this.position.y > canvas.height - this.speed) {
+            this.position.y = 0 + this.speed;
         }
 
-        if (this.position.x > canvas.width) {
-            this.position.x = 0;
+        if (this.position.x > canvas.width - this.speed) {
+            this.position.x = 0 + this.speed;
         }
 
-        if (this.position.x < 0) {
-            this.position.x = canvas.width;
+        if (this.position.x < 0 + this.speed) {
+            this.position.x = canvas.width - this.speed;
         }
 
         this.animation.position = this.position;
